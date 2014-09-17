@@ -19,10 +19,26 @@ const (
 	secret = "somesecret"
 )
 
+var (
+	SharedSecret = "somesecret"
+	Config       = `{
+	"Debug": true,
+	"DbMaxIddleConnections": 5,
+	"DbConnectString": "user=agora_http_go password=agora_http_go dbname=agora_http_go sslmode=disable",
+
+	"SharedSecret": "somesecret",
+	"Admins": ["test@example.com"],
+	"ActiveModules": [
+		"github.com/agoravoting/agora-http-go/demoapi"
+	],
+	"RavenDSN": ""
+}`
+)
+
 func TestEventApi(t *testing.T) {
-	ts := stest.New(t)
+	ts := stest.New(t, Config)
 	defer ts.TearDown()
-	auth_admin := map[string]string{"Authorization": middleware.AuthHeader("superuser", stest.SharedSecret)}
+	auth_admin := map[string]string{"Authorization": middleware.AuthHeader("superuser", SharedSecret)}
 
 	// do a post and get it back
 	newEvent := ts.RequestJson("POST", "/api/v1/event/", http.StatusAccepted, auth_admin, newEvent).(map[string]interface{})

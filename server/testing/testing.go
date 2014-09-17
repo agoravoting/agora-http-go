@@ -14,25 +14,8 @@ type TestServer struct {
 	t *testing.T
 }
 
-var (
-	NoHeader     = map[string]string{}
-	SharedSecret = "somesecret"
-	Config       = `{
-	"Debug": true,
-	"DbMaxIddleConnections": 5,
-	"DbConnectString": "user=agora_http_go password=agora_http_go dbname=agora_http_go sslmode=disable",
-
-	"SharedSecret": "somesecret",
-	"Admins": ["test@example.com"],
-	"ActiveModules": [
-		"github.com/agoravoting/agora-http-go/demoapi"
-	],
-	"RavenDSN": ""
-}`
-)
-
 // initializes the test server
-func New(t *testing.T) (ts *TestServer) {
+func New(t *testing.T, config string) (ts *TestServer) {
 	var (
 		name string
 	)
@@ -42,7 +25,7 @@ func New(t *testing.T) (ts *TestServer) {
 	if !s.Server.Initialized {
 		f, _ := ioutil.TempFile("", "testfile")
 		name = f.Name()
-		f.Write([]byte(Config))
+		f.Write([]byte(config))
 		f.Close()
 	}
 
