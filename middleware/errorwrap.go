@@ -44,7 +44,7 @@ func (ew *ErrorWrap) Do(handle ErrorHandler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		if err := handle(w, r, p); err != nil {
 			// record strange or internal errors
-			if err.Code >= http.StatusRequestTimeout && ew.Raven != nil {
+			if err.Code >= http.StatusRequestTimeout && !util.IsNil(ew.Raven) {
 				msg := fmt.Sprintf("Error: code=%d, message='%s', err=%v, stack=%v", err.Code, err.Message, err.Err, debug.Stack())
 				ew.Raven.CaptureMessage(msg)
 			}

@@ -122,3 +122,9 @@ func JsonMarshalOne(w http.ResponseWriter, m Marhsaller) {
 func JsonSortedMarshal(v interface{}) ([]byte, error) {
 	return json.Marshal(v)
 }
+
+// http://play.golang.org/p/eB7UKvdhLc
+func IsNil(i interface{}) bool {
+	val := reflect.ValueOf(i)
+	return !val.IsValid() || !val.Elem().IsValid()
+}
