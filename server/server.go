@@ -94,7 +94,7 @@ func (s *server) Init(confPath string) (err error) {
 	s.Http.Use(middleware.NewRecoveryJson(s.Logger, s.Raven))
 
 	// create the errorwrap middleware
-	s.ErrorWrap = middleware.NewErrorWrap(s)
+	s.ErrorWrap = middleware.NewErrorWrap(s, s.Logger)
 
 	// init modules, only once the server instance has been configured, and
 	// only those modules that user wants to activate

@@ -6,6 +6,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"runtime/debug"
+	"log"
 )
 
 // Ravenable is used to get the RavenClient from an object
@@ -32,11 +33,12 @@ type ErrorHandler func(rw http.ResponseWriter, r *http.Request, p httprouter.Par
 // ErrorWrap is a struct used to create an instance of this middleware.
 type ErrorWrap struct {
 	Raven RavenClientIface
+	Logger *log.Logger
 }
 
 // NewErrorWrap instantiates the ErrorWrap middleware
-func NewErrorWrap(r Ravenable) *ErrorWrap {
-	return &ErrorWrap{Raven: r.RavenClient()}
+func NewErrorWrap(r Ravenable, l *log.Logger) *ErrorWrap {
+	return &ErrorWrap{Raven: r.RavenClient(), Logger: l}
 }
 
 // ErrorWrap handles errors nicely and returns an standard httprouter.Handle.
@@ -48,6 +50,7 @@ func (ew *ErrorWrap) Do(handle ErrorHandler) httprouter.Handle {
 				msg := fmt.Sprintf("Error: code=%d, message='%s', err=%v, stack=%v", err.Code, err.Message, err.Err, debug.Stack())
 				ew.Raven.CaptureMessage(msg)
 			}
+			ew.Logger.Printf("Error: code=%d, message='%s', err=%v, stack=%v", err.Code, err.Message, err.Err, debug.Stack())
 
 			content, err2 := util.JsonSortedMarshal(&handledErrorJson{err.Message, err.CodedMessage})
 			if err2 != nil {
