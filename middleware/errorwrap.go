@@ -50,7 +50,7 @@ func (ew *ErrorWrap) Do(handle ErrorHandler) httprouter.Handle {
 				msg := fmt.Sprintf("Error: code=%d, message='%s', err=%v, stack=%v", err.Code, err.Message, err.Err, debug.Stack())
 				ew.Raven.CaptureMessage(msg)
 			}
-			ew.Logger.Printf("Error: code=%d, message='%s', err=%v, stack=%v", err.Code, err.Message, err.Err, debug.Stack())
+			ew.Logger.Printf("Error: code=%d, message='%s', err=%v", err.Code, err.Message, err.Err)
 
 			content, err2 := util.JsonSortedMarshal(&handledErrorJson{err.Message, err.CodedMessage})
 			if err2 != nil {
