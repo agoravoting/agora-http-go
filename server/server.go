@@ -64,11 +64,7 @@ func (s *server) Init(confPath string) (err error) {
 		s.Logger.Printf("Error reading config file %s %v", confPath, err)
 		return
 	}
-	/* err = json.Unmarshal([]byte(confStr), &s)
-	if err != nil {
-		s.Logger.Printf("Error reading config file %s %v", confPath, err)
-		return
-	}*/
+
 	var cfg map[string]*json.RawMessage
 	err = json.Unmarshal([]byte(confStr), &cfg)
 	if err != nil {
