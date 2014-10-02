@@ -30,7 +30,7 @@ func (ea *EventApi) Name() string {
 	return ea.name
 }
 
-func (ea *EventApi) Init() (err error) {
+func (ea *EventApi) Init(cfg map[string]*json.RawMessage) (err error) {
 	// setup the routes
 	ea.router = httprouter.New()
 	ea.router.GET("/", middleware.Join(

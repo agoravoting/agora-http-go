@@ -44,7 +44,7 @@ var Server server
 
 type Module interface {
 	Name() string
-	Init() error
+	Init(cfg map[string]*json.RawMessage) error
 }
 
 // initServer initializes the global Server variable.
@@ -54,18 +54,35 @@ func (s *server) Init(confPath string) (err error) {
 	if s.Initialized {
 		return
 	}
+
 	s.Logger = log.New(os.Stdout, "[agora-http-go] ", 0)
 	s.Mux = medeina.NewMedeina()
 
 	// parse config
 	confStr, err := util.Contents(confPath)
 	if err != nil {
+		s.Logger.Printf("Error reading config file %s %v", confPath, err)
 		return
 	}
-	err = json.Unmarshal([]byte(confStr), &s)
+	/* err = json.Unmarshal([]byte(confStr), &s)
 	if err != nil {
+		s.Logger.Printf("Error reading config file %s %v", confPath, err)
+		return
+	}*/
+	var cfg map[string]*json.RawMessage
+	err = json.Unmarshal([]byte(confStr), &cfg)
+	if err != nil {
+		s.Logger.Printf("Error reading config file %s %v", confPath, err)
 		return
 	}
+
+	json.Unmarshal(*cfg["Debug"], &s.Debug)
+	json.Unmarshal(*cfg["DbMaxIddleConnections"], &s.DbMaxIddleConnections)
+	json.Unmarshal(*cfg["DbConnectString"], &s.DbConnectString)
+	json.Unmarshal(*cfg["SharedSecret"], &s.SharedSecret)
+	json.Unmarshal(*cfg["Admins"], &s.Admins)
+	json.Unmarshal(*cfg["ActiveModules"], &s.ActiveModules)
+	json.Unmarshal(*cfg["RavenDSN"], &s.RavenDSN)
 
 	// configure database
 	s.DbConnectString = os.ExpandEnv(s.DbConnectString)
@@ -108,7 +125,7 @@ func (s *server) Init(confPath string) (err error) {
 				continue
 			}
 			s.Logger.Print("Loading module: " + mod_name)
-			if err = module.Init(); err != nil {
+			if err = module.Init(cfg); err != nil {
 				s.Logger.Fatal(err)
 			}
 			break
